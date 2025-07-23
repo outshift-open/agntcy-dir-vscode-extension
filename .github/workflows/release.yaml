@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      with:
+        fetch-depth: 0
+        ref: ${{ inputs.tag }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Package extension
+      run: npx @vscode/vsce package -o "agntcy-dir-${{ inputs.tag }}.vsix"
+
+    - name: Generate Changelog
+      run: |
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ inputs.tag }}^ 2>/dev/null || echo "")
+        if [ -z "$PREVIOUS_TAG" ]; then
+          git log --pretty=format:'- %s' ${{ inputs.tag }} > CHANGELOG.md
+        else
+         git log --pretty=format:'- %s' $PREVIOUS_TAG..${{ inputs.tag }} > CHANGELOG.md
+        fi
+
+    - name: Create Release
+      run: |
+        gh release create ${{ inputs.tag }} \
+          --title "Release ${{ inputs.tag }}" \
+          --notes-file CHANGELOG.md \
+          ./agntcy-dir-${{ inputs.tag }}.vsix
+      env:
+        GH_TOKEN: ${{ github.token }}

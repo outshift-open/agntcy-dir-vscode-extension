@@ -1,0 +1,378 @@
+{
+  "name": "agent-directory",
+  "displayName": "Agent Directory",
+  "description": "An extension to fetch and push OASF records",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "publisher": "AGNTCY",
+  "icon": "resources/agntcy-logo.png",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "AI",
+    "Agent",
+    "OASF",
+    "Agent Directory",
+    "AGNTCY"
+  ],
+  "files": [
+    "out/**",
+    "node_modules/**",
+    "resources/**",
+    "walkthroughs/**",
+    "README.md",
+    "LICENSE.txt"
+  ],
+  "preview": true,
+  "pricing": "Free",
+  "homepage": "https://github.com/outshift-open/agntcy-dir-vscode-extension/blob/main/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/outshift-open/agntcy-dir-vscode-extension.git"
+  },
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "*.oasf",
+          "*.oasf.json"
+        ],
+        "url": "https://schema.oasf.outshift.com/schema/0.6.0/objects/record"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "submenu_1",
+        "label": "Source"
+      },
+      {
+        "id": "submenu_2",
+        "label": "Record Type"
+      },
+      {
+        "id": "submenu_3",
+        "label": "Sort By"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "agent-directory.signRecord",
+          "when": "resourceFilename =~ /.oasf.json$/",
+          "group": "navigation"
+        },
+        {
+          "command": "agent-directory.pushRecord",
+          "when": "resourceFilename =~ /.oasf.json$/",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "agent-directory.pushRecord",
+          "when": "resourceFilename =~ /.oasf.json$/"
+        },
+        {
+          "command": "agent-directory.signRecord",
+          "when": "resourceFilename =~ /.oasf.json$/"
+        },
+        {
+          "command": "agent-directory.convertChatModeToOASF",
+          "when": "resourceFilename =~ /.chatmode.md$/ || editorLangId == chatMode"
+        },
+        {
+          "command": "agent-directory.importAsMCPServer",
+          "when": "editorLangId == 'agent-directory.languageId.oasf.mcp'"
+        },
+        {
+          "command": "agent-directory.convertOASFToChatMode",
+          "when": "editorLangId == 'agent-directory.languageId.oasf.chatMode'"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "agent-directory.openRecord",
+          "when": "webviewId == agent-directory.listof-records && webviewSection != filterRecords"
+        },
+        {
+          "command": "agent-directory.importAsMCPServer",
+          "when": "webviewId == agent-directory.listof-records && webviewSection == mcpRecordItem"
+        },
+        {
+          "command": "agent-directory.saveAndOpenAsCopilotChatMode",
+          "when": "webviewId == agent-directory.listof-records && webviewSection == vscodeChatModeAgentItem"
+        },
+        {
+          "submenu": "submenu_1",
+          "when": "webviewSection == filterRecords",
+          "group": "1"
+        },
+        {
+          "submenu": "submenu_2",
+          "group": "1",
+          "when": "webviewSection == filterRecords"
+        },
+        {
+          "submenu": "submenu_3",
+          "group": "2",
+          "when": "webviewSection == filterRecords"
+        }
+      ],
+      "submenu_1": [
+        {
+          "command": "agent-directory.allRecords"
+        },
+        {
+          "command": "agent-directory.mcpRecords"
+        },
+        {
+          "command": "agent-directory.agentsRecords"
+        }
+      ],
+      "submenu_2": [
+        {
+          "command": "agent-directory.privateRecords"
+        },
+        {
+          "command": "agent-directory.publicRecords"
+        }
+      ],
+      "submenu_3": [
+        {
+          "command": "agent-directory.sortMostRecent"
+        },
+        {
+          "command": "agent-directory.sortOldest"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AGNTCY Agent Directory",
+      "type": "object",
+      "properties": {
+        "agntcy.agent-directory.directoryURL": {
+          "type": "string",
+          "format": "uri",
+          "default": "https://agent-directory.outshift.com",
+          "markdownDescription": "Specifies the URL or IP address of the Agent Directory. Defaults to the hosted Outshift Directory Manager at `https://agent-directory.outshift.com`. If you are running a self-hosted instance of the [Agent Directory](https://github.com/agntcy/dir), update this value to point to your local instance (e.g., `0.0.0.0:8888`)."
+        },
+        "agntcy.agent-directory.dirctlBinary": {
+          "type": "string",
+          "format": "path",
+          "default": "~/.agntcy/bin/dirctl",
+          "markdownDescription": "Path to the `dirctl` binary. The extension will attempt to automatically download it to the default location. For manual installation, refer to the [installation instructions](https://docs.agntcy.org/dir/hosted-agent-directory/#pre-req-1-install-dirctl)."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "agent-directory.login",
+        "title": "Login",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.logout",
+        "title": "Logout",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.selectOrganization",
+        "title": "Select Organization",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.openRecord",
+        "title": "Open OASF Record",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.signRecord",
+        "title": "Sign OASF Record",
+        "category": "AGNTCY",
+        "icon": "$(key)"
+      },
+      {
+        "command": "agent-directory.pushRecord",
+        "title": "Push OASF Record",
+        "category": "AGNTCY",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "agent-directory.importAsMCPServer",
+        "title": "Install OASF Record as MCP Server",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.saveAndOpenAsCopilotChatMode",
+        "title": "Save and Open as VSCode Copilot Chat Mode",
+        "category": "AGNTCY",
+        "when": "chatIsEnabled"
+      },
+      {
+        "command": "agent-directory.convertChatModeToOASF",
+        "title": "Convert Chat Mode to OASF Record",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.convertOASFToChatMode",
+        "title": "Convert OASF Record to Chat Mode",
+        "category": "AGNTCY"
+      },
+      {
+        "command": "agent-directory.allRecords",
+        "title": "All",
+        "enablement": "true"
+      },
+      {
+        "command": "agent-directory.privateRecords",
+        "title": "My Directory"
+      },
+      {
+        "command": "agent-directory.publicRecords",
+        "title": "Public Directory"
+      },
+      {
+        "command": "agent-directory.sortMostRecent",
+        "title": "Most Recent"
+      },
+      {
+        "command": "agent-directory.sortOldest",
+        "title": "Oldest"
+      },
+      {
+        "command": "agent-directory.agentsRecords",
+        "title": "Agents"
+      },
+      {
+        "command": "agent-directory.mcpRecords",
+        "title": "MCP Servers"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "hub-extension",
+          "title": "Agent Directory",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "hub-extension": [
+        {
+          "id": "agent-directory.listof-records",
+          "name": "Search",
+          "type": "webview",
+          "visibility": "collapsed",
+          "initialSize": 50,
+          "icon": ""
+        },
+        {
+          "id": "agent-directory.authentication",
+          "name": "Authentication",
+          "initialSize": 150,
+          "visibility": "visible",
+          "type": "webview",
+          "icon": ""
+        }
+      ]
+    },
+    "walkthroughs": [
+      {
+        "id": "agntcy.agent-directory",
+        "title": "Getting Started with Agent Directory",
+        "description": "Learn how to use the Agent Directory extension to discover and manage, OASF records.",
+        "steps": [
+          {
+            "id": "configure-extension",
+            "title": "Configure the Extension",
+            "description": "Before you begin, you might want to configure the Agent Directory URL. This is especially important if you are running a self-hosted instance of the directory. You can change this in the extension settings.\n[Open Settings](command:workbench.action.openSettings?agntcy.agent-directory)",
+            "media": {
+              "image": "walkthroughs/config.png",
+              "altText": "Configure Extension Settings"
+            }
+          },
+          {
+            "id": "login",
+            "title": "Login to Agent Directory",
+            "description": "If you have configured the extension to use the hosted AGNTCY Agent Directory, you will need to log in to access your private records and push new ones.\n[Login](command:agent-directory.login)",
+            "media": {
+              "image": "./walkthroughs/login.gif",
+              "altText": "Login to Agent Directory"
+            },
+            "completionEvents": [
+              "onCommand:agent-directory.login"
+            ]
+          },
+          {
+            "id": "search",
+            "title": "Search for Records",
+            "description": "Use the search bar to find agents and models in the directory. You can filter by source, type, and sort by date.\n[Open Search View](command:agent-directory.listof-records.focus)",
+            "media": {
+              "image": "./walkthroughs/search.gif",
+              "altText": "Search for Records"
+            },
+            "completionEvents": [
+              "onView:agent-directory.listof-records"
+            ]
+          },
+          {
+            "id": "open-record",
+            "title": "Open a Record",
+            "description": "Click on a record to open it in the editor. From there, you can view its details, sign it, or push it to the directory.\n[Find a record to open](command:agent-directory.listof-records.focus)",
+            "media": {
+              "image": "./walkthroughs/open_sign_push.gif",
+              "altText": "Open a Record"
+            },
+            "completionEvents": [
+              "onCommand:agent-directory.openRecord"
+            ]
+          },
+          {
+            "id": "import-mcp-server",
+            "title": "Install an MCP Server",
+            "description": "You can install an OASF record as an MCP server. This will allow you to interact with the agent or model through a local server.\n[Find an MCP server to install](command:agent-directory.listof-records.focus)",
+            "media": {
+              "image": "./walkthroughs/install_mcp.gif",
+              "altText": "Install an MCP Server"
+            },
+            "completionEvents": [
+              "onCommand:agent-directory.importAsMCPServer"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.102.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.6.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "@vscode/codicons": "0.0.40"
+  }
+}
