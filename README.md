@@ -68,6 +68,11 @@ There are no known issues at this time. Please report any bugs or feature
 requests on the [GitHub issues
 page](https://github.com/outshift-open/agntcy-dir-vscode-extension/issues).
 
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated. For detailed contributing guidelines, please see [contributing guidelines](CONTRIBUTING.md).
+
+
 ### Copyright Notice
 
 [Copyright Notice and License](./LICENSE.txt)
