@@ -25,6 +25,7 @@ import { SettingsProvider } from "./providers/SettingsProvider";
 import { RecordListProvider } from "./providers/RecordListProvider";
 import { openChatModeCommand, convertChatModeToOASFCommand, convertOASFToChatModeCommand } from "./commands/importCopilotChatMode";
 import { ADRestClient } from "./clients/ADRestClient";
+import { browseForDirctlBinary } from "./commands/browseDirctlBinary";
 import { ensureDirctlIsInstalled } from "./clients/DirctlDownloader";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -47,6 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const agentListProvider = new RecordListProvider(context.extensionUri, context);
 
+  context.subscriptions.push(vscode.commands.registerCommand("agent-directory.browseDirctlBinary", browseForDirctlBinary));
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.login", loginCmd(context)));
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.logout", logoutCmd(context)));
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.selectOrganization", async () => {
