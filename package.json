@@ -43,7 +43,7 @@
           "*.oasf",
           "*.oasf.json"
         ],
-        "url": "https://schema.oasf.outshift.com/schema/0.6.0/objects/record"
+        "url": "https://schema.oasf.outshift.com/schema/0.7.0/objects/record"
       }
     ],
     "submenus": [

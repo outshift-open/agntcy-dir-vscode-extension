@@ -15,7 +15,7 @@
 
 
 import { ADRestClient } from "../../clients/ADRestClient";
-import { OASF_RECORD_SCHEMA_VERSION, OASFRecord, Locator } from "../../model/oasfRecord-0.6.0";
+import { OASF_RECORD_SCHEMA_VERSION, OASFRecord, RecordLocator } from "../../model/oasfRecord-0.7.0";
 import { Directory } from "./Directory";
 import { DirctlWrapper } from "../../clients/DirctlWrapper";
 import { HubRecord } from "../saasModels";
@@ -72,11 +72,11 @@ function hubRecordToOASFRecord(hubRecord: HubRecord): OASFRecord {
     created_at: new Date(hubRecord.createdAt),
     description: hubRecord.description,
     domains: [],
-    extensions: hubRecord.extensions ? hubRecord.extensions.map(ext => ({
+    modules: hubRecord.extensions ? hubRecord.extensions.map(ext => ({
       data: undefined,
       name: ext
     })) : [],
-    locators: hubRecord.locators?.map(locator => ({ type: locator.type, url: locator.url } as Locator)),
+    locators: hubRecord.locators?.map(locator => ({ type: locator.type, url: locator.url } as RecordLocator)),
     name: hubRecord.name,
     schema_version: OASF_RECORD_SCHEMA_VERSION,
     skills: [],

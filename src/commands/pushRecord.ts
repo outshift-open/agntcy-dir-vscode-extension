@@ -15,7 +15,7 @@
 
 
 import * as vscode from "vscode";
-import { OASFRecord } from "../model/oasfRecord-0.6.0";
+import { OASFRecord } from "../model/oasfRecord-0.7.0";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
 
 export function pushRecord() {

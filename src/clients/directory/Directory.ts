@@ -14,7 +14,7 @@
 // limitations under the License.
 
 
-import { OASFRecord } from "../../model/oasfRecord-0.6.0";
+import { OASFRecord } from "../../model/oasfRecord-0.7.0";
 
 export interface Directory {
   login(): Promise<string>;

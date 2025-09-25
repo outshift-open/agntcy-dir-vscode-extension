@@ -18,7 +18,7 @@ import * as fs from "fs";
 import vscode from "vscode";
 import { getNonce } from "./utils";
 import { getConfigs } from "../config/readSession";
-import { MCP_EXTENSION_NAME, LLM_TOOLS_EXTENSION_NAME, OASFRecord } from "../model/oasfRecord-0.6.0";
+import { MCP_MODULE_NAME, LLM_TOOLS_MODULE_NAME, OASFRecord } from "../model/oasfRecord-0.7.0";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
 import { Organization } from "../clients/saasModels";
 
@@ -243,11 +243,10 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
   }
 
   private isMCPServer(oasfRecord: OASFRecord): boolean {
-    return oasfRecord.extensions?.find((ext) => ext.name === MCP_EXTENSION_NAME) !== undefined;
+    return oasfRecord.modules?.find((ext) => ext.name === MCP_MODULE_NAME) !== undefined;
   }
 
   private isLLMTools(oasfRecord: OASFRecord): boolean {
-    return oasfRecord.extensions?.find((ext) => ext.name === LLM_TOOLS_EXTENSION_NAME) !== undefined;
+    return oasfRecord.modules?.find((ext) => ext.name === LLM_TOOLS_MODULE_NAME) !== undefined;
   }
 }
-

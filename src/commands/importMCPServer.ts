@@ -15,22 +15,22 @@
 
 
 import * as vscode from "vscode";
-import { MCP_EXTENSION_NAME, OASFRecord, OASFMCPExtension } from "../model/oasfRecord-0.6.0";
+import { MCP_MODULE_NAME, OASFRecord, OASFMCPModule } from "../model/oasfRecord-0.7.0";
 import { MCPServerConfiguration } from "../model/vscodeModels";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
 
 function createMcpServerConfiguration(oasfRecord: OASFRecord): MCPServerConfiguration | undefined {
-  const mcpExtension = oasfRecord.extensions?.find(
-    (ext) => ext.name === MCP_EXTENSION_NAME
-  ) as OASFMCPExtension | undefined;
+  const mcpModule = oasfRecord.modules?.find(
+    (module) => module.name === MCP_MODULE_NAME
+  ) as OASFMCPModule | undefined;
 
-  if (!mcpExtension) {
-    throw new Error("No MCP extension found in OASF record.");
+  if (!mcpModule) {
+    throw new Error(`No '${MCP_MODULE_NAME}' module found in OASF record.`);
   }
 
-  const servers = mcpExtension.data.servers;
+  const servers = mcpModule.data.servers;
   if (!servers || Object.keys(servers).length === 0) {
-    throw new Error("No servers defined in MCP extension.");
+    throw new Error(`No servers defined in '${MCP_MODULE_NAME}' module.`);
   }
 
   const server = servers[0];
