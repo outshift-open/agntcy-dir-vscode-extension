@@ -166,11 +166,16 @@
           "type": "string",
           "format": "path",
           "default": "~/.agntcy/bin/dirctl",
-          "markdownDescription": "Path to the `dirctl` binary. The extension will attempt to automatically download it to the default location. For manual installation, refer to the [installation instructions](https://docs.agntcy.org/dir/hosted-agent-directory/#pre-req-1-install-dirctl)."
+          "markdownDescription": "Path to the `dirctl` binary. The extension will attempt to automatically download it to the default location. For manual installation, refer to the [installation instructions](https://docs.agntcy.org/dir/hosted-agent-directory/#pre-req-1-install-dirctl).\n\n[Browse](command:agent-directory.browseDirctlBinary)"
         }
       }
     },
     "commands": [
+      {
+        "command": "agent-directory.browseDirctlBinary",
+        "title": "Agent Directory: Browse for dirctl binary",
+        "category": "AGNTCY"
+      },
       {
         "command": "agent-directory.login",
         "title": "Login",
@@ -292,8 +297,7 @@
           {
             "id": "configure-extension",
             "title": "Configure the Extension",
-            "description": "Before you begin, you might want to configure the Agent Directory URL. This is especially important if you are running a self-hosted instance of the directory. You can change this in the extension settings.\n[Open Settings](command:workbench.action.openSettings?agntcy.agent-directory)",
-            "media": {
+            "description": "Before you begin, you might want to configure the Agent Directory URL. This is especially important if you are running a self-hosted instance of the directory. You can change this in the extension settings.\n[Open Settings](command:workbench.action.openSettings?%5B%22agntcy.agent-directory%22%5D)","media": {
               "image": "walkthroughs/config.png",
               "altText": "Configure Extension Settings"
             }
