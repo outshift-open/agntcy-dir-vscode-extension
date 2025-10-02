@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 export interface Category {
   uid: number;
   name: string;
@@ -42,17 +41,12 @@ export interface HubRecord {
   version: string;
 }
 
-export interface Repository {
-  createdAt: string;
-  description: string;
-  id: string;
-  name: string;
-  organizationId: string,
-  private: boolean;
+export interface RecordsResponse {
+  paginatedResponse: {
+    count: number;
+    pages: number;
+  };
   records: HubRecord[];
-  repoType: string;
-  updatedAt: string;
-  userId: string;
 }
 
 export interface Organization {

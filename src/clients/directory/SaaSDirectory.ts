@@ -33,15 +33,14 @@ export class SaaSDirectory implements Directory {
     return output.trim();
   }
 
-  async search(searchTerm: string, filter?: "all" | "mcps" | "agents", oldestFirst?: boolean, ownedOnly?: boolean,
+  async search(searchTerm: string, oldestFirst?: boolean,
     organizationId?: string): Promise<{ records: OASFRecord[], digests: string[], repoIds: string[] }> {
-    const repositories = await this.adRestClient.getRepositories(
-      searchTerm, filter, oldestFirst, ownedOnly, organizationId
+    const hubRecords = await this.adRestClient.getRecords(
+      searchTerm, oldestFirst, organizationId
     );
-    const mostRecentRecords: HubRecord[] = repositories.map(repo => repo.records?.[0]);
-    const oasfRecords: OASFRecord[] = mostRecentRecords.map(hubRecordToOASFRecord);
-    const digests = mostRecentRecords.map(record => record.digest);
-    const repoIds = mostRecentRecords.map(record => record.repositoryId);
+    const oasfRecords: OASFRecord[] = hubRecords.map(hubRecordToOASFRecord);
+    const digests = hubRecords.map(record => record.digest);
+    const repoIds = hubRecords.map(record => record.repositoryId);
     return { records: oasfRecords, digests, repoIds };
   }
 

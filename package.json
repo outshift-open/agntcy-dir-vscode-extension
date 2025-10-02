@@ -48,10 +48,6 @@
     ],
     "submenus": [
       {
-        "id": "submenu_1",
-        "label": "Source"
-      },
-      {
         "id": "submenu_2",
         "label": "Record Type"
       },
@@ -109,11 +105,6 @@
           "when": "webviewId == agent-directory.listof-records && webviewSection == vscodeChatModeAgentItem"
         },
         {
-          "submenu": "submenu_1",
-          "when": "webviewSection == filterRecords",
-          "group": "1"
-        },
-        {
           "submenu": "submenu_2",
           "group": "1",
           "when": "webviewSection == filterRecords"
@@ -122,17 +113,6 @@
           "submenu": "submenu_3",
           "group": "2",
           "when": "webviewSection == filterRecords"
-        }
-      ],
-      "submenu_1": [
-        {
-          "command": "agent-directory.allRecords"
-        },
-        {
-          "command": "agent-directory.mcpRecords"
-        },
-        {
-          "command": "agent-directory.agentsRecords"
         }
       ],
       "submenu_2": [
@@ -236,11 +216,11 @@
       },
       {
         "command": "agent-directory.privateRecords",
-        "title": "My Directory"
+        "title": "Records in my org"
       },
       {
         "command": "agent-directory.publicRecords",
-        "title": "Public Directory"
+        "title": "Public Records"
       },
       {
         "command": "agent-directory.sortMostRecent",

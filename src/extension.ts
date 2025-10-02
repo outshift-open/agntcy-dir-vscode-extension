@@ -79,29 +79,6 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("agent-directory.allRecords", async () => {
-      vscode.commands.executeCommand(
-        "setContext",
-        "filterRecords",
-        "agent-directory.allRecords"
-      );
-      await agentListProvider.filterRecords("all");
-    })
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "agent-directory.agentsRecords",
-      async () => {
-        await agentListProvider.filterRecords("agents");
-      }
-    )
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand("agent-directory.mcpRecords", async () => {
-      await agentListProvider.filterRecords("mcps");
-    })
-  );
-  context.subscriptions.push(
     vscode.commands.registerCommand(
       "agent-directory.sortMostRecent",
       async () => {

@@ -26,7 +26,6 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "agent-directory.listof-records";
   private searchTerm = "";
   private _view?: vscode.WebviewView;
-  private filter: "all" | "mcps" | "agents" = "all";
   private oldestFirst: boolean = false;
   private ownedOnly: boolean = false;
 
@@ -67,8 +66,6 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
           `${config.directoryURL}/explore/${m.text}`
         );
         vscode.env.openExternal(url);
-      } else if (m.command === "agent-directory.clearFilter") {
-        this.filter = "all";
       } else if (m.command === "agent-directory.importAsMCPServer") {
         vscode.commands.executeCommand("setContext", "agent", m.data);
         vscode.commands.executeCommand(m.command, m.data);
@@ -107,10 +104,10 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
         const agentIcon = this._view.webview.asWebviewUri(
           vscode.Uri.joinPath(this._extensionUri, "resources", "agent_icon.svg")
         );
-        const selectedOrganization = this.context.workspaceState.get<Organization>("agent-directory.selectedOrganization")?.id || "";
+        const selectedOrganization = this.ownedOnly ? this.context.workspaceState.get<Organization>("agent-directory.selectedOrganization")?.id || "" : "";
         const directory = DirectoryFactory.getInstance();
         const { records: oasfRecords, digests, repoIds } = await directory.search(
-          this.searchTerm, this.filter, this.oldestFirst, this.ownedOnly, selectedOrganization);
+          this.searchTerm, this.oldestFirst, selectedOrganization);
 
         oasfRecords.forEach((oasfRecord: OASFRecord) => {
           const isChatMode = this.isLLMTools(oasfRecord);
@@ -210,25 +207,7 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
     );
   }
 
-  async filterRecords(filter: "all" | "mcps" | "agents") {
-    this.filter = filter;
-    await vscode.window.withProgress(
-      {
-        location: { viewId: "agent-directory.listof-records" },
-      },
-      async (progress) => {
-        this._view?.webview.postMessage({
-          command: "agent-directory.updateFilter",
-          text: filter,
-        });
-        await this.updateListOfRecords();
-
-        progress.report({ increment: 100 });
-      }
-    );
-  }
-
-  async sortRecords(oldestFirst: boolean = false) {
+    async sortRecords(oldestFirst: boolean = false) {
     this.oldestFirst = oldestFirst;
     await vscode.window.withProgress(
       {
