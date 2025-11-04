@@ -19,7 +19,7 @@ import { execFile } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
 
-import { OASFRecord } from "../model/oasfRecord-0.6.0";
+import { OASFRecord } from "../model/oasfRecord-0.7.0";
 
 export class DirctlWrapper {
   private static getDirctlBinary(): string {

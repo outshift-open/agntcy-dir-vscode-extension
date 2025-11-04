@@ -150,7 +150,7 @@ export class ADRestClient {
     try {
       responseBody = await response.json();
     } catch (error) {
-      console.log("Error parsing JSON:", error);
+      console.error("Error parsing JSON:", error);
       responseBody = await response.text();
       throw new APIError(response.status, response.statusText, responseBody);
     }

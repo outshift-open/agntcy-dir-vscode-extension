@@ -13,8 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-export const OASF_RECORD_SCHEMA_VERSION = "v0.6.0";
+export const OASF_RECORD_SCHEMA_VERSION = "v0.7.0";
 
 export interface StringMap {
   [key: string]: string;
@@ -32,29 +31,35 @@ export interface Skill {
   name?: string;
 }
 
-export interface Locator {
+export interface RecordLocator {
   annotations?: StringMap;
   digest?: string;
   size?: number;
-  type: "binary" | "unspecified" | "helm_chart" | "docker_image" | "python_package" | "source_code";
+  type:
+  | "binary"
+  | "docker_image"
+  | "helm_chart"
+  | "python_package"
+  | "source_code"
+  | "unspecified";
   url: string;
 }
 
 export interface RecordSignature {
-  algorithm: string;
+  algorithm?: string;
   annotations?: StringMap;
-  certificate: string;
-  content_bundle: string;
-  content_type: string;
+  certificate?: string;
+  content_bundle?: string;
+  content_type?: string;
   signature: string;
-  signed_at: Date;
+  signed_at?: Date;
 }
 
-export interface Extension {
+export interface Module {
   annotations?: StringMap;
   data: any;
+  id?: number;
   name: string;
-  version?: string;
 }
 
 export interface OASFRecord {
@@ -62,20 +67,18 @@ export interface OASFRecord {
   authors: string[];
   created_at: Date;
   description: string;
-  domains: Domain[];
-  extensions?: Extension[];
-  locators: Locator[];
+  domains?: Domain[];
+  locators: RecordLocator[];
+  modules?: Module[];
   name: string;
   previous_record_cid?: string;
-  schema_url?: string;
-  schema_version: "v0.6.0";
+  schema_version: "v0.7.0";
   signature?: RecordSignature;
   skills: Skill[];
   version: string;
 }
 
-
-// == MCP OASF Extension ==
+// == MCP OASF Module ==
 export interface EnvironmentVariable {
   default_value?: string;
   description: string;
@@ -91,24 +94,27 @@ export interface MCPServerPrompt {
 }
 
 export type MCPServerResource = {
-  audience: Array<'user' | 'assistant'>;
+  audience: Array<"user" | "assistant">;
   description?: string;
   mime_type?: string;
   name: string;
   priority?: number;
   title?: string;
-} & ({ uri: string; uri_template?: never; } | { uri?: never; uri_template: string; });
+} & (
+    | { uri: string; uri_template?: never }
+    | { uri?: never; uri_template: string }
+  );
 
 export interface MCPServerTool {
   description?: string;
   name: string;
-  scopes?: Array<'external' | 'read_only' | 'idempotent' | 'destructive'>;
+  scopes?: Array<"destructive" | "external" | "idempotent" | "read_only">;
   title?: string;
 }
 
 export interface MCPServer {
   args?: string[];
-  capabilities: Array<'notify' | 'subscribe'>;
+  capabilities: Array<"notify" | "subscribe">;
   command?: string;
   description?: string;
   env_vars?: EnvironmentVariable[];
@@ -116,10 +122,10 @@ export interface MCPServer {
   name: string;
   prompts?: MCPServerPrompt[];
   resources?: MCPServerResource[];
-  scope?: 'local' | 'project' | 'user';
-  title?: string
+  scope?: "local" | "project" | "user";
+  title?: string;
   tools?: MCPServerTool[];
-  type: 'http' | 'local' | 'sse';
+  type: "http" | "local" | "sse";
   url?: string;
 }
 
@@ -127,32 +133,32 @@ export interface MCPData {
   servers: MCPServer[];
 }
 
-export const MCP_EXTENSION_NAME = 'runtime/mcp';
-export interface OASFMCPExtension extends Extension {
-  name: typeof MCP_EXTENSION_NAME;
+export const MCP_MODULE_NAME = "runtime/mcp";
+export interface OASFMCPModule extends Module {
+  name: typeof MCP_MODULE_NAME;
   data: MCPData;
 }
-// == MCP OASF Extension ==
+// == MCP OASF Module ==
 
-// == Prompt OASF Extension ==
+// == Prompt OASF Module ==
 export interface LLMPrompt {
   name: string;
   description: string;
   command: string;
 }
 
-export interface OASFPromptExtensionData {
+export interface OASFPromptModuleData {
   prompts: LLMPrompt[];
 }
 
-export const PROMPT_EXTENSION_NAME = 'runtime/prompt';
-export interface OASFPromptExtension extends Extension {
-  name: typeof PROMPT_EXTENSION_NAME;
-  data: OASFPromptExtensionData;
+export const PROMPT_MODULE_NAME = "runtime/prompt";
+export interface OASFPromptModule extends Module {
+  name: typeof PROMPT_MODULE_NAME;
+  data: OASFPromptModuleData;
 }
-// == Prompt OASF Extension ==
+// == Prompt OASF Module ==
 
-// == Model OASF Extension ==
+// == Model OASF Module ==
 export interface LLMModel {
   api_base: string;
   api_key: string;
@@ -164,23 +170,23 @@ export interface LLMModelData {
   models: LLMModel[];
 }
 
-export const MODEL_EXTENSION_NAME = 'runtime/model';
-export interface OASFModelExtension extends Extension {
-  name: typeof MODEL_EXTENSION_NAME;
+export const MODEL_MODULE_NAME = "runtime/model";
+export interface OASFModelModule extends Module {
+  name: typeof MODEL_MODULE_NAME;
   data: LLMModelData;
 }
-// == Model OASF Extension ==
+// == Model OASF Module ==
 
-// == LLMTools OASF Extension ==
+// == LLMTools OASF Module ==
 export interface LLMToolsData {
   mcp_server_tools?: string[];
   models: string[];
   prompts: string[];
   tools?: string[];
 }
-export const LLM_TOOLS_EXTENSION_NAME = 'runtime/llm_tools';
-export interface OASFLLMToolsExtension extends Extension {
-  name: typeof LLM_TOOLS_EXTENSION_NAME;
+export const LLM_TOOLS_MODULE_NAME = "runtime/llm_tools";
+export interface OASFLLMToolsModule extends Module {
+  name: typeof LLM_TOOLS_MODULE_NAME;
   data: LLMToolsData;
 }
-// == LLMTools OASF Extension ==
+// == LLMTools OASF Module ==

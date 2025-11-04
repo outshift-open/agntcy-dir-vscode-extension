@@ -22,12 +22,12 @@ import * as os from "os";
 import { VscodeCopilotChatMode } from "../model/vscodeModels";
 import {
   OASF_RECORD_SCHEMA_VERSION, OASFRecord,
-  LLM_TOOLS_EXTENSION_NAME, OASFLLMToolsExtension as OASFLLMToolsExtension,
-  MODEL_EXTENSION_NAME, OASFModelExtension, LLMModel,
-  PROMPT_EXTENSION_NAME, OASFPromptExtension,
-  MCP_EXTENSION_NAME, OASFMCPExtension,
-  Extension
-} from "../model/oasfRecord-0.6.0";
+  LLM_TOOLS_MODULE_NAME, OASFLLMToolsModule,
+  MODEL_MODULE_NAME, OASFModelModule, LLMModel,
+  PROMPT_MODULE_NAME, OASFPromptModule,
+  MCP_MODULE_NAME, OASFMCPModule,
+  Module
+} from "../model/oasfRecord-0.7.0";
 import { newEditorWithContent, saveAndOpenFile } from "./utils";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
 
@@ -36,68 +36,68 @@ function safeRecordName(name: string): string {
 }
 
 function oasfToChatMode(oasf: OASFRecord): VscodeCopilotChatMode | undefined {
-  const llmToolsExtension = oasf.extensions?.find(
-    (ext): ext is OASFLLMToolsExtension => ext.name === LLM_TOOLS_EXTENSION_NAME
+  const llmToolsModule = oasf.modules?.find(
+    (module): module is OASFLLMToolsModule => module.name === LLM_TOOLS_MODULE_NAME
   );
-  if (!llmToolsExtension) {
-    console.log("LLM Tools extension not found");
+  if (!llmToolsModule) {
+    console.error("LLM Tools module not found");
     return undefined;
   }
 
-  // Find the prompt extension
-  const promptExtension = oasf.extensions?.find(
-    (ext): ext is OASFPromptExtension => ext.name === PROMPT_EXTENSION_NAME
+  // Find the prompt module
+  const promptModule = oasf.modules?.find(
+    (module): module is OASFPromptModule => module.name === PROMPT_MODULE_NAME
   );
-  if (!promptExtension) {
-    console.log("Required prompt extension not found");
+  if (!promptModule) {
+    console.error("Required prompt module not found");
     return undefined;
   }
-  // Take the first prompt of the list and find the corresponding prompt in the prompt extension
-  const promptName = llmToolsExtension.data.prompts?.[0];
-  const prompt = promptName ? promptExtension.data.prompts.find(p => p.name === promptName) : undefined;
+  // Take the first prompt of the list and find the corresponding prompt in the prompt module
+  const promptName = llmToolsModule.data.prompts?.[0];
+  const prompt = promptName ? promptModule.data.prompts.find(p => p.name === promptName) : undefined;
   if (!prompt) {
-    console.log("Prompt not found");
+    console.error("Prompt not found");
     return undefined;
   }
 
-  // Find the model extension (optional)
-  // Take the first model of the list and find the corresponding model in the model extension
+  // Find the model module (optional)
+  // Take the first model of the list and find the corresponding model in the model module
   var model: LLMModel | undefined = undefined;
-  const modelName = llmToolsExtension.data.models?.[0];
+  const modelName = llmToolsModule.data.models?.[0];
   if (modelName) {
-    const modelExtension = oasf.extensions?.find(
-      (ext): ext is OASFModelExtension => ext.name === MODEL_EXTENSION_NAME
+    const modelModule = oasf.modules?.find(
+      (module): module is OASFModelModule => module.name === MODEL_MODULE_NAME
     );
-    if (!modelExtension) {
-      console.log("Model extension not found");
+    if (!modelModule) {
+      console.error("Model module not found");
       return undefined;
     }
-    model = modelExtension.data.models.find(m => m.model === modelName);
+    model = modelModule.data.models.find(m => m.model === modelName);
     if (!model) {
-      console.log("Model not found in the model extension");
+      console.error("Model not found in the model module");
       return undefined;
     }
   }
 
-  // Find the MCP extension (optional)
-  var mcpExtension: OASFMCPExtension | undefined = undefined;
-  if (llmToolsExtension.data.mcp_server_tools && llmToolsExtension.data.mcp_server_tools.length > 0) {
-    mcpExtension = oasf.extensions?.find(
-      (ext): ext is OASFMCPExtension => ext.name === MCP_EXTENSION_NAME
+  // Find the MCP module (optional)
+  var mcpModule: OASFMCPModule | undefined = undefined;
+  if (llmToolsModule.data.mcp_server_tools && llmToolsModule.data.mcp_server_tools.length > 0) {
+    mcpModule = oasf.modules?.find(
+      (module): module is OASFMCPModule => module.name === MCP_MODULE_NAME
     );
-    if (!mcpExtension) {
-      console.log("MCP extension not found");
+    if (!mcpModule) {
+      console.error("MCP module not found");
       return undefined;
     }
   }
 
-  const externalTools = llmToolsExtension.data.tools ?? [];
+  const externalTools = llmToolsModule.data.tools ?? [];
 
-  // Don't get the tools from the extension at the moment.
+  // Don't get the tools from the module at the moment.
   // Just use the MCP tools list
-  const mcpTools = llmToolsExtension.data.mcp_server_tools ?? [];
+  const mcpTools = llmToolsModule.data.mcp_server_tools ?? [];
 
-  if (llmToolsExtension) {
+  if (llmToolsModule) {
     return {
       description: prompt.description,
       tools: [...externalTools, ...mcpTools],
@@ -118,10 +118,10 @@ function getAuthors(): string[] {
 }
 
 function convertChatModeToOASF(chatModeName: string, chatMode: VscodeCopilotChatMode): OASFRecord {
-  var extensions: Extension[] = [];
+  var modules: Module[] = [];
 
-  const llmToolsExtension: OASFLLMToolsExtension = {
-    name: LLM_TOOLS_EXTENSION_NAME,
+  const llmToolsModule: OASFLLMToolsModule = {
+    name: LLM_TOOLS_MODULE_NAME,
     data: {
       mcp_server_tools: [],
       models: chatMode.model ? [chatMode.model] : [],
@@ -129,10 +129,10 @@ function convertChatModeToOASF(chatModeName: string, chatMode: VscodeCopilotChat
       tools: chatMode.tools,
     }
   };
-  extensions.push(llmToolsExtension);
+  modules.push(llmToolsModule);
 
-  const promptExtension: OASFPromptExtension = {
-    name: PROMPT_EXTENSION_NAME,
+  const promptModule: OASFPromptModule = {
+    name: PROMPT_MODULE_NAME,
     data: {
       prompts: [
         {
@@ -143,11 +143,11 @@ function convertChatModeToOASF(chatModeName: string, chatMode: VscodeCopilotChat
       ]
     }
   };
-  extensions.push(promptExtension);
+  modules.push(promptModule);
 
   if (chatMode.model) {
-    const modelExtension: OASFModelExtension = {
-      name: MODEL_EXTENSION_NAME,
+    const modelModule: OASFModelModule = {
+      name: MODEL_MODULE_NAME,
       data: {
         models: [
           {
@@ -159,7 +159,7 @@ function convertChatModeToOASF(chatModeName: string, chatMode: VscodeCopilotChat
         ]
       }
     };
-    extensions.push(modelExtension);
+    modules.push(modelModule);
   }
 
   const authors = getAuthors();
@@ -172,7 +172,7 @@ function convertChatModeToOASF(chatModeName: string, chatMode: VscodeCopilotChat
         "name": "technology/software_engineering"
       }
     ],
-    extensions: extensions,
+    modules: modules,
     locators: [],
     name: chatModeName,
     schema_version: OASF_RECORD_SCHEMA_VERSION,
@@ -343,8 +343,6 @@ export async function askChatModeLocation(context: vscode.ExtensionContext, safe
     canPickMany: false,
     matchOnDescription: true,
   });
-
-  console.log(selectedLocation?.chatModeLocation);
 
   let chatModeName = await vscode.window.showInputBox({
     prompt: "Enter the name for the chat mode",
