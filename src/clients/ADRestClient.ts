@@ -14,7 +14,7 @@
 // limitations under the License.
 
 
-import { Repository, Organization } from "./saasModels";
+import { Organization, RecordsResponse, HubRecord } from "./saasModels";
 import { getConfigs } from "../config/readSession";
 
 export class APIError extends Error {
@@ -27,14 +27,6 @@ export class APIError extends Error {
     super(message || `HTTP error! status: ${status} ${statusText}`);
     this.name = "APIError";
   }
-}
-
-interface GetRepositoriesResponse {
-  paginatedResponse: {
-    count: number;
-    pages: number;
-  }
-  repositories: Repository[];
 }
 
 interface OrganizationResponse {
@@ -60,21 +52,14 @@ interface RequestOptions {
 export class ADRestClient {
   constructor() { }
 
-  async getRepositories(
+  async getRecords(
     searchTerm?: string,
-    filter: "all" | "mcps" | "agents" = "all",
     oldestFirst: boolean = false,
-    ownedOnly: boolean = false,
     organizationId: string = "",
-  ): Promise<Repository[]> {
-    const showPrivate = organizationId !== "" ? true : false;
+  ): Promise<HubRecord[]> {
     const params = new URLSearchParams({
       "pagination.pageSize": "100",
       "order.orderBy": "createdAt",
-      includeRecords: "true",
-      notEmpty: "true",
-      ownedOnly: ownedOnly.toString(),
-      recordsFilter: `${filter}`,
     });
 
     if (searchTerm && searchTerm.length) {
@@ -84,17 +69,22 @@ export class ADRestClient {
       params.append("order.order", "ORDER_ASC");
     }
 
+    var endpoint: string;
+
     if (organizationId !== "") {
-      params.append("filters.showPrivate", "true");
-      params.append("organizationId", organizationId);
+      endpoint = `/v1alpha1/organizations/${organizationId}/records?${params.toString()}`;
+    } else {
+      endpoint = `/v1alpha1/records?${params.toString()}`;
     }
-    
-    const response = await this._request<GetRepositoriesResponse>({
+
+    console.log("Fetching records from endpoint:", endpoint);
+
+    const response = await this._request<RecordsResponse>({
       method: "GET",
-      endpoint: `/v1alpha1/repositories?${params.toString()}`,
+      endpoint: endpoint,
       withAuth: organizationId ? true : false,
     });
-    return response.repositories ?? [];
+    return response.records ?? [];
   }
 
   async getOrganizations(): Promise<GetOrganizationsResponse> {
@@ -159,6 +149,14 @@ export class ADRestClient {
   }
 
   private getAPIFromURL(url: string): string {
+    if (url.startsWith("https://phoenix.dev.outshift.ai")) {
+      return "https://saas.agent-directory.dev.outshift.ai";
+    }
+
+    if (url.startsWith("https://phoenix.staging.outshift.ai")) {
+      return "https://saas.phoenix.staging.outshift.ai/rest";
+    }
+
     const parsedURL = new URL(url);
     const hostParts = parsedURL.hostname.split(".");
     hostParts.unshift('api');

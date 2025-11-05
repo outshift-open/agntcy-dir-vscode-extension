@@ -21,9 +21,7 @@ export interface Directory {
   logout(): Promise<string>;
   search(
     searchTerm: string, 
-    filter?: string, 
     oldestFirst?: boolean,
-    ownedOnly?: boolean,
     organizationId?: string): Promise<{ records: OASFRecord[], digests: string[], repoIds?: string[] }>;
   push(record: OASFRecord): Promise<string>;
   sign(record: OASFRecord): Promise<string>;
