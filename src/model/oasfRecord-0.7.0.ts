@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const OASF_RECORD_SCHEMA_VERSION = "v0.7.0";
+export const OASF_RECORD_SCHEMA_VERSION = "0.7.0";
 
 export interface StringMap {
   [key: string]: string;
@@ -72,7 +72,7 @@ export interface OASFRecord {
   modules?: Module[];
   name: string;
   previous_record_cid?: string;
-  schema_version: "v0.7.0";
+  schema_version: "0.7.0";
   signature?: RecordSignature;
   skills: Skill[];
   version: string;

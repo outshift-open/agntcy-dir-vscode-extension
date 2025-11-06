@@ -18,7 +18,7 @@ import { ADRestClient } from "../../clients/ADRestClient";
 import { OASF_RECORD_SCHEMA_VERSION, OASFRecord, RecordLocator } from "../../model/oasfRecord-0.7.0";
 import { Directory } from "./Directory";
 import { DirctlWrapper } from "../../clients/DirctlWrapper";
-import { HubRecord } from "../saasModels";
+import { DMRecord } from "../saasModels";
 
 export class SaaSDirectory implements Directory {
   constructor(private readonly adRestClient: ADRestClient) { }
@@ -34,51 +34,48 @@ export class SaaSDirectory implements Directory {
   }
 
   async search(searchTerm: string, oldestFirst?: boolean,
-    organizationId?: string): Promise<{ records: OASFRecord[], digests: string[], repoIds: string[] }> {
-    const hubRecords = await this.adRestClient.getRecords(
+    organizationId?: string): Promise<{ records: OASFRecord[], cids: string[], ids: string[]}> {
+    const dmRecords = await this.adRestClient.getRecords(
       searchTerm, oldestFirst, organizationId
     );
-    const oasfRecords: OASFRecord[] = hubRecords.map(hubRecordToOASFRecord);
-    const digests = hubRecords.map(record => record.digest);
-    const repoIds = hubRecords.map(record => record.repositoryId);
-    return { records: oasfRecords, digests, repoIds };
+    const oasfRecords: OASFRecord[] = dmRecords.map(dmRecordToOASFRecord);
+    const cids = dmRecords.map(record => record.recordCid || "");
+    const ids = dmRecords.map(record => record.id || "");
+    return { records: oasfRecords, ids, cids };
   }
 
-  async push(oasfRecord: OASFRecord): Promise<string> {
-    const output = await DirctlWrapper.exec(["hub", "push", oasfRecord.name], {
+  async push(oasfRecord: OASFRecord, organization: string): Promise<string> {
+    const output = await DirctlWrapper.exec(["hub", "push", organization], {
       stdin: JSON.stringify(oasfRecord)
     });
     return output.trim();
   }
 
-  async sign(record: OASFRecord): Promise<string> {
-    const dataToSign = JSON.stringify(record);
-    const signedOutput = await DirctlWrapper.exec(["hub", "sign"], {
-      stdin: dataToSign
-    });
+  async sign(organization: string, cid: string): Promise<string> {
+    const signedOutput = await DirctlWrapper.exec(["hub", "sign", organization, cid]);
     return signedOutput.trim();
   }
 
-  async pull(digest: string): Promise<OASFRecord> {
-    const output = await DirctlWrapper.exec(["hub", "pull", digest]);
+  async pull(cid: string): Promise<OASFRecord> {
+    const output = await DirctlWrapper.exec(["hub", "pull", cid]);
     return JSON.parse(output) as OASFRecord;
   }
 }
 
-function hubRecordToOASFRecord(hubRecord: HubRecord): OASFRecord {
+function dmRecordToOASFRecord(dmRecord: DMRecord): OASFRecord {
   return {
-    authors: hubRecord.authors,
-    created_at: new Date(hubRecord.createdAt),
-    description: hubRecord.description,
+    authors: dmRecord.authors,
+    created_at: new Date(dmRecord.createdAt || ""),
+    description: dmRecord.description || "",
     domains: [],
-    modules: hubRecord.extensions ? hubRecord.extensions.map(ext => ({
+    modules: dmRecord.modules ? dmRecord.modules.map(ext => ({
       data: undefined,
       name: ext
     })) : [],
-    locators: hubRecord.locators?.map(locator => ({ type: locator.type, url: locator.url } as RecordLocator)),
-    name: hubRecord.name,
+    locators: dmRecord.locators?.map(locator => ({ type: locator.type, url: locator.url } as RecordLocator)) || [],
+    name: dmRecord.name || "",
     schema_version: OASF_RECORD_SCHEMA_VERSION,
     skills: [],
-    version: hubRecord.version,
+    version: dmRecord.version || "",
   };
 }

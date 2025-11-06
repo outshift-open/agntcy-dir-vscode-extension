@@ -26,27 +26,14 @@ export interface Locators {
   url: string;
 }
 
-export interface HubRecord {
-  authors: string[];
-  createdAt: string;
-  description: string;
-  digest: string;
-  extensions?: string[];
-  id: string;
-  locators: Locators[];
-  name: string;
-  repositoryId: string;
-  updatedAt: string;
-  userId: string;
-  version: string;
-}
+
 
 export interface RecordsResponse {
   paginatedResponse: {
     count: number;
     pages: number;
   };
-  records: HubRecord[];
+  records: DMRecord[];
 }
 
 export interface Organization {
@@ -54,4 +41,59 @@ export interface Organization {
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface GoogleProtobufAny {
+  '@type': string;
+  [key: string]: any;
+}
+
+export interface GoogleProtobufValue {
+  [key: string]: any;
+}
+
+export interface A2A {
+  protocolVersion?: string;
+  version?: string;
+  url?: string;
+  capabilities?: Record<string, any>;
+  defaultInputModes?: string[];
+  defaultOutputModes?: string[];
+  skills?: Record<string, any>[];
+}
+
+export interface Mcp {
+  tools?: GoogleProtobufValue[];
+  resources?: GoogleProtobufValue[];
+  prompts?: GoogleProtobufValue[];
+}
+
+export enum Visibility {
+  UNSPECIFIED = 'unspecified',
+  PRIVATE = 'private',
+  PUBLIC = 'public'
+}
+
+export interface DMRecord {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  nameRef?: string;
+  name?: string;
+  version?: string;
+  blobRef?: string;
+  annotations?: Record<string, string>;
+  categories?: Category[];
+  locators?: Locators[];
+  userId?: string;
+  description?: string;
+  authors: string[];
+  modules?: string[];
+  mcp?: Mcp;
+  a2a?: A2A;
+  recordType?: string;
+  identityAppId?: string;
+  visibility?: Visibility;
+  previousRecordCid?: string;
+  recordCid?: string;
 }

@@ -17,8 +17,9 @@
 import * as vscode from "vscode";
 import { OASFRecord } from "../model/oasfRecord-0.7.0";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
+import { Organization } from "../clients/saasModels";
 
-export function pushRecord() {
+export function pushRecord(context: vscode.ExtensionContext) {
   return async () => {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -28,10 +29,12 @@ export function pushRecord() {
     const oasfRecordContent = editor.document.getText();
     const oasfRecord: OASFRecord = JSON.parse(oasfRecordContent) as OASFRecord;
 
+    const selectedOrganization = context.workspaceState.get<Organization>("agent-directory.selectedOrganization")?.name || "";
+
     try {
       const directory = DirectoryFactory.getInstance();
-      const output = await directory.push(oasfRecord);
-      vscode.window.showInformationMessage("Pushed new record: " + output.trim());
+      const output = await directory.push(oasfRecord, selectedOrganization);
+      vscode.window.showInformationMessage("Pushed new record. CID: " + output.trim());
     } catch (error) {
       vscode.window.showErrorMessage("Failed to push record: " + error);
     }

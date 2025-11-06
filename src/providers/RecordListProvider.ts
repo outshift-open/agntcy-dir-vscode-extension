@@ -89,33 +89,29 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
           return;
         }
 
-        const agenticServices: Array<
+        const records: Array<
           OASFRecord & {
-            digest: string;
-            repoId?: string;
+            id: string;
+            cid: string;
             iconUri: string;
             itemType: "agentItem" | "mcpRecordItem" | "vscodeChatModeAgentItem";
           }
         > = [];
-        const mcpIcon = this._view.webview.asWebviewUri(
-          vscode.Uri.joinPath(this._extensionUri, "resources", "mcp_icon.svg")
-        );
-
-        const agentIcon = this._view.webview.asWebviewUri(
-          vscode.Uri.joinPath(this._extensionUri, "resources", "agent_icon.svg")
-        );
+        const mcpIcon = this._view.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "resources", "mcp_icon.svg"));
+        const agentIcon = this._view.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "resources", "agent_icon.svg"));
+        
         const selectedOrganization = this.ownedOnly ? this.context.workspaceState.get<Organization>("agent-directory.selectedOrganization")?.id || "" : "";
         const directory = DirectoryFactory.getInstance();
-        const { records: oasfRecords, digests, repoIds } = await directory.search(
-          this.searchTerm, this.oldestFirst, selectedOrganization);
+        const { records: oasfRecords, ids, cids } = await directory.search(this.searchTerm, this.oldestFirst, selectedOrganization);
 
         oasfRecords.forEach((oasfRecord: OASFRecord) => {
           const isChatMode = this.isLLMTools(oasfRecord);
           const isMcp = this.isMCPServer(oasfRecord);
-          agenticServices.push({
+          
+          records.push({
             ...oasfRecord,
-            digest: digests[oasfRecords.indexOf(oasfRecord)],
-            repoId: repoIds?.[oasfRecords.indexOf(oasfRecord)],
+            id: ids?.[oasfRecords.indexOf(oasfRecord)] || "",
+            cid: cids[oasfRecords.indexOf(oasfRecord)], 
             iconUri: isMcp ? mcpIcon.toString() : agentIcon.toString(),
             itemType: isMcp
               ? "mcpRecordItem"
@@ -127,7 +123,7 @@ export class RecordListProvider implements vscode.WebviewViewProvider {
 
         this._view.webview.postMessage({
           command: "agent-directory.listRecords",
-          data: agenticServices,
+          data: records,
           dirctlMode: getConfigs().dirctlMode,
         });
         progress.report({ increment: 100 });

@@ -21,6 +21,6 @@ suite('LocalDirectory Test Suite', () => {
         const localDirectory = new LocalDirectory();
         const invalidSearchTerm = 'invalid search term';
         const result = await localDirectory.search(invalidSearchTerm);
-        assert.deepStrictEqual(result, { records: [], digests: [] });
+        assert.deepStrictEqual(result, { records: [], cids: [] });
     });
 });

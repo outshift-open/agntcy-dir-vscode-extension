@@ -12,13 +12,13 @@
       card.className = "card";
       card.id = cardId;
 
-      const agentJson = {
+      const recordJson = {
         webviewSection: item.itemType,
         preventDefaultContextMenuItems: true,
         agent: {
           name: item.name,
           version: item.version,
-          digest: item.digest,
+          cid: item.cid,
         },
       };
 
@@ -51,13 +51,13 @@
       const installButton = document.createElement("button");
       installButton.id = `install_btn_${item.itemType}`;
       installButton.className = "install-button";
-      installButton.dataset.record = JSON.stringify(agentJson);
+      installButton.dataset.record = JSON.stringify(recordJson);
       installButton.textContent = "install";
 
       const settingsIcon = document.createElement("i");
       settingsIcon.className = "icon codicon codicon-gear";
       settingsIcon.id = `_${item.id}_settings`;
-      settingsIcon.dataset.vscodeContext = JSON.stringify(agentJson);
+      settingsIcon.dataset.vscodeContext = JSON.stringify(recordJson);
 
       cardActions.appendChild(installButton);
       cardActions.appendChild(settingsIcon);
@@ -67,7 +67,7 @@
         globeIcon.className = "icon codicon codicon-globe";
         globeIcon.id = `_${item.id}_browse`;
         cardActions.appendChild(globeIcon);
-        card.dataset.repoId = item.repoId;
+        card.dataset.cid = item.cid;
       }
 
       card.appendChild(cardContent);
@@ -102,10 +102,11 @@
       e.preventDefault();
       e.stopPropagation();
       const card = target.closest(".card");
-      const repoId = card.dataset.repoId;
+      const cardcid = card.dataset.cid;
+      console.log("Opening in browser:", cardcid);
       vscode.postMessage({
         command: "agent-directory.openInbrowser",
-        text: repoId,
+        text: cardcid,
       });
     } else if (target.classList.contains("install-button")) {
       const record = JSON.parse(target.dataset.record);

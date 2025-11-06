@@ -27,6 +27,7 @@ export async function selectOrganization(context: vscode.ExtensionContext, adRes
     const selected = orgsResponse.organizations.find(org => `${org.organization.name}` === selectedOrg);
     const selectedOrganization = selected?.organization;
     context.workspaceState.update("agent-directory.selectedOrganization", selectedOrganization);
+    vscode.commands.executeCommand('setContext', 'agent-directory.selectedOrganization', selectedOrganization?.name);
 
     // Notify webview
     vscode.commands.executeCommand("agent-directory.refresh-auth-view");

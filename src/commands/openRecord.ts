@@ -29,18 +29,13 @@ export function openRecord() {
       const { agent } = item;
 
       const directory = DirectoryFactory.getInstance();
-      const oasfRecord = await directory.pull(agent.digest);
+      const oasfRecord = await directory.pull(agent.cid);
       const oasfRecordContent = JSON.stringify(oasfRecord, null, 2);
 
       const safeAgentName = agent.name.replace(/[^\w.-]/g, "_");
       const fileName = `${safeAgentName}-${agent.version}.oasf.json`;
 
-      const itemTypeToLanguageId: Record<string, string> = {
-        "mcpRecordItem": "agent-directory.languageId.oasf.mcp",
-        "vscodeChatModeAgentItem": "agent-directory.languageId.oasf.chatmode",
-      };
-      const languageId = itemTypeToLanguageId[item.webviewSection];
-      newEditorWithContent(fileName, oasfRecordContent, languageId);
+      newEditorWithContent(fileName, oasfRecordContent);
     } catch (error) {
       console.error("Failed to open record:", error);
       const message = error instanceof Error ? error.message : String(error);
