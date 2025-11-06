@@ -14,7 +14,7 @@
 // limitations under the License.
 
 
-import { Organization, RecordsResponse, HubRecord } from "./saasModels";
+import { Organization, RecordsResponse, DMRecord } from "./saasModels";
 import { getConfigs } from "../config/readSession";
 
 export class APIError extends Error {
@@ -56,7 +56,7 @@ export class ADRestClient {
     searchTerm?: string,
     oldestFirst: boolean = false,
     organizationId: string = "",
-  ): Promise<HubRecord[]> {
+  ): Promise<DMRecord[]> {
     const params = new URLSearchParams({
       "pagination.pageSize": "100",
       "order.orderBy": "createdAt",

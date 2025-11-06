@@ -222,7 +222,7 @@ export function openChatModeCommand(context: vscode.ExtensionContext) {
       const { agent } = item;
       DirectoryFactory.getInstance();
       const directory = DirectoryFactory.getInstance();
-      const oasfRecord = await directory.pull(agent.digest);
+      const oasfRecord = await directory.pull(agent.cid);
       const chatMode = oasfToChatMode(oasfRecord);
       if (!chatMode) {
         vscode.window.showErrorMessage("Failed to convert OASF to chat mode.");

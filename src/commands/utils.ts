@@ -25,6 +25,7 @@ export async function newEditorWithContent(fileName: string, content: string, la
       vscode.languages.setTextDocumentLanguage(document, languageId);
     }
     const editor = await vscode.window.showTextDocument(document);
+    
     return await editor.edit(editBuilder => {
       editBuilder.insert(new vscode.Position(0, 0), content);
     });

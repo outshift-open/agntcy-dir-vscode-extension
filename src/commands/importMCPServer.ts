@@ -80,7 +80,7 @@ export function importMCPServer() {
           );
 
           const directory = DirectoryFactory.getInstance();
-          const oasfRecord = await directory.pull(agent.digest);
+          const oasfRecord = await directory.pull(agent.cid);
 
           const mcpConfiguration = createMcpServerConfiguration(oasfRecord);
           const link = vscode.Uri.parse(

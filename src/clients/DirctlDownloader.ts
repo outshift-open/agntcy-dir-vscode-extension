@@ -27,7 +27,7 @@ import { promisify } from 'util';
 const pipeline = promisify(stream.pipeline);
 const execFile = promisify(cp.execFile);
 
-const DIRCTL_VERSION = '0.4.0';
+const DIRCTL_VERSION = '0.5.0-rc.2';
 const BINARY_NAME = 'dirctl';
 
 type Platform = 'darwin' | 'linux' | 'windows';

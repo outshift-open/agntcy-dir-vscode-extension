@@ -63,8 +63,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.convertChatModeToOASF", convertChatModeToOASFCommand()));
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.convertOASFToChatMode", convertOASFToChatModeCommand()));
-  context.subscriptions.push(vscode.commands.registerCommand("agent-directory.pushRecord", pushRecord()));
-  context.subscriptions.push(vscode.commands.registerCommand("agent-directory.signRecord", signRecord()));
+  context.subscriptions.push(vscode.commands.registerCommand("agent-directory.pushRecord", pushRecord(context)));
+  context.subscriptions.push(vscode.commands.registerCommand("agent-directory.signRecord", signRecord(context)));
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(

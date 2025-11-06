@@ -59,11 +59,6 @@
     "menus": {
       "editor/title": [
         {
-          "command": "agent-directory.signRecord",
-          "when": "resourceFilename =~ /.oasf.json$/",
-          "group": "navigation"
-        },
-        {
           "command": "agent-directory.pushRecord",
           "when": "resourceFilename =~ /.oasf.json$/",
           "group": "navigation"
@@ -72,10 +67,6 @@
       "editor/context": [
         {
           "command": "agent-directory.pushRecord",
-          "when": "resourceFilename =~ /.oasf.json$/"
-        },
-        {
-          "command": "agent-directory.signRecord",
           "when": "resourceFilename =~ /.oasf.json$/"
         },
         {
@@ -94,6 +85,10 @@
       "webview/context": [
         {
           "command": "agent-directory.openRecord",
+          "when": "webviewId == agent-directory.listof-records && webviewSection != filterRecords"
+        },
+        {
+          "command": "agent-directory.signRecord",
           "when": "webviewId == agent-directory.listof-records && webviewSection != filterRecords"
         },
         {
