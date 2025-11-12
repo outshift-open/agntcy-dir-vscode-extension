@@ -33,13 +33,13 @@ export class LocalDirectory implements Directory {
     searchTerm = searchTerm.trim();
 
     // Do not execute the search query if this doesn't look like a valid search term
-    const validSearchTerm = /^[a-zA-Z0-9-_=,]+$/;
+    const validSearchTerm = /^[a-zA-Z0-9-_=,*]+$/;
     if (searchTerm.length !== 0 && !validSearchTerm.test(searchTerm)) {
       return { records: [], cids: [] };
     }
 
-    // Do not execute the search query if this doesn't look like key=value pairs
-    let searchQuery = [];
+    // Parse key=value pairs and map to command-line flags
+    let searchQuery: string[] = [];
     if (searchTerm.length !== 0) {
       const pairs = searchTerm.split(',');
       for (const pair of pairs) {
@@ -47,14 +47,42 @@ export class LocalDirectory implements Directory {
         if (parts.length !== 2) {
           return { records: [], cids: [] };
         }
-        if (parts[0].trim().length === 0 || parts[1].trim().length === 0) {
+        const key = parts[0].trim();
+        const value = parts[1].trim();
+        if (key.length === 0 || value.length === 0) {
           return { records: [], cids: [] };
         }
-        searchQuery.push("--query", pair.trim());
+
+        switch (key) {
+          case 'locator':
+            searchQuery.push('--locator', value);
+            break;
+          case 'module':
+            searchQuery.push('--module', value);
+            break;
+          case 'name':
+            searchQuery.push('--name', value);
+            break;
+          case 'skill':
+            searchQuery.push('--skill', value);
+            break;
+          case 'skill-id':
+            searchQuery.push('--skill-id', value);
+            break;
+          case 'version':
+            searchQuery.push('--version', value);
+            break;
+          default:
+            return { records: [], cids: [] };
+        }
       }
     }
 
     const jsonRecordCids: string = await DirctlWrapper.exec(["search", "--json",  ...searchQuery]);
+    if (jsonRecordCids.trim() === "No record CIDs found") {
+      return { records: [], cids: [] };
+    }
+
     const recordsCids: string[] = JSON.parse(jsonRecordCids);
 
     const oasfRecords: OASFRecord[] = [];
