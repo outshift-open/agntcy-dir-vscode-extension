@@ -27,7 +27,7 @@ import { promisify } from 'util';
 const pipeline = promisify(stream.pipeline);
 const execFile = promisify(cp.execFile);
 
-const DIRCTL_VERSION = '0.5.0-rc.3';
+const DIRCTL_VERSION = '0.5.0';
 const BINARY_NAME = 'dirctl';
 
 type Platform = 'darwin' | 'linux' | 'windows';
@@ -41,11 +41,11 @@ interface Asset {
 
 export class DirctlDownloader {
   private static assets: Asset[] = [
-    { platform: 'darwin', arch: 'amd64', sha256: '48b8ab31fca93b7cacf824bf0a997513db18e8ebe8be3ae24b96e3bff1c63ca0' },
-    { platform: 'darwin', arch: 'arm64', sha256: '43ab11786036664c32f439d050dfa84e74a9d1b48976b247e7cac5ccafd534de' },
-    { platform: 'linux', arch: 'amd64', sha256: 'b9f1398c827ef69de370aa6487e50a30c8344ff4588eb531ddfceffa75901548' },
-    { platform: 'linux', arch: 'arm64', sha256: 'ae88a6e4ad54ff0b053317ff036c623fcd1634c11d01d4376ec1a678a61e70b8' },
-    { platform: 'windows', arch: 'amd64', sha256: 'db2b89d4ee3d3bc9fdb7faf1abc88a7a078a53c9a36c41d4d21e8d32fc9f87ef' }
+    { platform: 'darwin', arch: 'amd64', sha256: 'ae59b6664ef1eb62b76d501048941ec553bef8dd193925e0efb8e338c74a1deb' },
+    { platform: 'darwin', arch: 'arm64', sha256: '5ad294bc60f529a2f4f4b33e6776c89715d44c230d6571b6261279f2f697d5be' },
+    { platform: 'linux', arch: 'amd64', sha256: '5a75e10b53c694cde658c6e8406512184828b4b46531c179b36c492e7ef7f8b5' },
+    { platform: 'linux', arch: 'arm64', sha256: '046a118a1dfd0c99858919e6026acb3febaed86e1624e6a25d3038598417c454' },
+    { platform: 'windows', arch: 'amd64', sha256: 'd566485094e41ef89ec96c058d611b73c4aa71602dca25b89b18a165c7342cc4' }
   ];
 
   constructor(private context: vscode.ExtensionContext) { }

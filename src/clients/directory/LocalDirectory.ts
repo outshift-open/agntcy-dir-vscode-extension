@@ -78,7 +78,7 @@ export class LocalDirectory implements Directory {
       }
     }
 
-    const jsonRecordCids: string = await DirctlWrapper.exec(["search", "--json",  ...searchQuery]);
+    const jsonRecordCids: string = await DirctlWrapper.exec(["search", "--output", "json", ...searchQuery]);
     if (jsonRecordCids.trim() === "No record CIDs found") {
       return { records: [], cids: [] };
     }
@@ -88,7 +88,7 @@ export class LocalDirectory implements Directory {
     const oasfRecords: OASFRecord[] = [];
     for (const cid of recordsCids) {
       try {
-        const record = await DirctlWrapper.exec(["pull", "--json", cid]);
+        const record = await DirctlWrapper.exec(["pull", "--output", "json", cid]);
         const oasfRecord = JSON.parse(record) as OASFRecord;
         oasfRecords.push(oasfRecord);
       } catch (e) {
@@ -99,10 +99,11 @@ export class LocalDirectory implements Directory {
   }
 
   async push(oasfRecord: OASFRecord): Promise<string> {
-    const output = await DirctlWrapper.exec(["push"], {
+    const output = await DirctlWrapper.exec(["push", "--output", "json"], {
       stdin: JSON.stringify(oasfRecord)
     });
-    return output.trim();
+    const cid: string = JSON.parse(output) as string;
+    return cid;
   }
 
   async sign(organization: string = "", cid: string): Promise<string> {
@@ -111,7 +112,7 @@ export class LocalDirectory implements Directory {
   }
 
   async pull(cid: string): Promise<OASFRecord> {
-    const output = await DirctlWrapper.exec(["pull", "--json", cid]);
+    const output = await DirctlWrapper.exec(["pull", "--output", "json", cid]);
     return JSON.parse(output) as OASFRecord;
   }
 }
