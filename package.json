@@ -2,7 +2,7 @@
   "name": "agent-directory",
   "displayName": "Agent Directory",
   "description": "An extension to fetch and push OASF records",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "publisher": "AGNTCY",
   "icon": "resources/agntcy-logo.png",
