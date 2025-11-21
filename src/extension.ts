@@ -20,6 +20,7 @@ import { openRecord } from "./commands/openRecord";
 import { importMCPServer } from "./commands/importMCPServer";
 import { pushRecord } from "./commands/pushRecord";
 import { signRecord } from "./commands/signRecord";
+import { pushAndSignRecord } from "./commands/pushAndSignRecord";
 import { selectOrganization } from "./commands/selectOrganization";
 import { SettingsProvider } from "./providers/SettingsProvider";
 import { RecordListProvider } from "./providers/RecordListProvider";
@@ -65,6 +66,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.convertOASFToChatMode", convertOASFToChatModeCommand()));
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.pushRecord", pushRecord(context)));
   context.subscriptions.push(vscode.commands.registerCommand("agent-directory.signRecord", signRecord(context)));
+  context.subscriptions.push(vscode.commands.registerCommand("agent-directory.pushAndSignRecord", pushAndSignRecord(context)));
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
