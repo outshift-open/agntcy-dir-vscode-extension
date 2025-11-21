@@ -22,8 +22,8 @@ export interface Directory {
   search(
     searchTerm: string, 
     oldestFirst?: boolean,
-    organizationId?: string): Promise<{ records: OASFRecord[], digests: string[], repoIds?: string[] }>;
-  push(record: OASFRecord): Promise<string>;
-  sign(record: OASFRecord): Promise<string>;
-  pull(digest: string): Promise<OASFRecord>;
+    organizationId?: string): Promise<{ records: OASFRecord[], ids?: string[], cids: string[] }>;
+  push(record: OASFRecord, organization: string): Promise<string>;
+  sign(organization: string, cid: string): Promise<string>;
+  pull(cid: string): Promise<OASFRecord>;
 }

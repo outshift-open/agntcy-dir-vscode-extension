@@ -29,62 +29,90 @@ export class LocalDirectory implements Directory {
     return Promise.resolve("No logout available for local directory");
   }
 
-  async search(searchTerm: string): Promise<{ records: OASFRecord[], digests: string[] }> {
+  async search(searchTerm: string): Promise<{ records: OASFRecord[], cids: string[] }> {
     searchTerm = searchTerm.trim();
 
     // Do not execute the search query if this doesn't look like a valid search term
-    const validSearchTerm = /^[a-zA-Z0-9-_=,]+$/;
+    const validSearchTerm = /^[a-zA-Z0-9-_=,*]+$/;
     if (searchTerm.length !== 0 && !validSearchTerm.test(searchTerm)) {
-      return { records: [], digests: [] };
+      return { records: [], cids: [] };
     }
 
-    // Do not execute the search query if this doesn't look like key=value pairs
-    let searchQuery = [];
+    // Parse key=value pairs and map to command-line flags
+    let searchQuery: string[] = [];
     if (searchTerm.length !== 0) {
       const pairs = searchTerm.split(',');
       for (const pair of pairs) {
         const parts = pair.split('=');
         if (parts.length !== 2) {
-          return { records: [], digests: [] };
+          return { records: [], cids: [] };
         }
-        if (parts[0].trim().length === 0 || parts[1].trim().length === 0) {
-          return { records: [], digests: [] };
+        const key = parts[0].trim();
+        const value = parts[1].trim();
+        if (key.length === 0 || value.length === 0) {
+          return { records: [], cids: [] };
         }
-        searchQuery.push("--query", pair.trim());
+
+        switch (key) {
+          case 'locator':
+            searchQuery.push('--locator', value);
+            break;
+          case 'module':
+            searchQuery.push('--module', value);
+            break;
+          case 'name':
+            searchQuery.push('--name', value);
+            break;
+          case 'skill':
+            searchQuery.push('--skill', value);
+            break;
+          case 'skill-id':
+            searchQuery.push('--skill-id', value);
+            break;
+          case 'version':
+            searchQuery.push('--version', value);
+            break;
+          default:
+            return { records: [], cids: [] };
+        }
       }
     }
 
-    const recordsDigests: string[] = (await DirctlWrapper.exec(["search", ...searchQuery])).split("\n").map(line => line.trim()).filter(line => line.length > 0);
+    const jsonRecordCids: string = await DirctlWrapper.exec(["search", "--output", "json", ...searchQuery]);
+    if (jsonRecordCids.trim() === "No record CIDs found") {
+      return { records: [], cids: [] };
+    }
+
+    const recordsCids: string[] = JSON.parse(jsonRecordCids);
+
     const oasfRecords: OASFRecord[] = [];
-    for (const digest of recordsDigests) {
+    for (const cid of recordsCids) {
       try {
-        const record = await DirctlWrapper.exec(["pull", digest]);
+        const record = await DirctlWrapper.exec(["pull", "--output", "json", cid]);
         const oasfRecord = JSON.parse(record) as OASFRecord;
         oasfRecords.push(oasfRecord);
       } catch (e) {
-        console.error(`Failed to pull record with digest ${digest}:`, e);
+        console.error(`Failed to pull record with cid ${cid}:`, e);
       }
     }
-    return { records: oasfRecords, digests: recordsDigests };
+    return { records: oasfRecords, cids: recordsCids };
   }
 
   async push(oasfRecord: OASFRecord): Promise<string> {
-    const output = await DirctlWrapper.exec(["push"], {
+    const output = await DirctlWrapper.exec(["push", "--output", "json"], {
       stdin: JSON.stringify(oasfRecord)
     });
-    return output.trim();
+    const cid: string = JSON.parse(output) as string;
+    return cid;
   }
 
-  async sign(record: OASFRecord): Promise<string> {
-    const dataToSign = JSON.stringify(record);
-    const signedOutput = await DirctlWrapper.exec(["sign"], {
-      stdin: dataToSign
-    });
+  async sign(organization: string = "", cid: string): Promise<string> {
+    const signedOutput = await DirctlWrapper.exec(["sign", cid]);
     return signedOutput.trim();
   }
 
-  async pull(digest: string): Promise<OASFRecord> {
-    const output = await DirctlWrapper.exec(["pull", digest]);
+  async pull(cid: string): Promise<OASFRecord> {
+    const output = await DirctlWrapper.exec(["pull", "--output", "json", cid]);
     return JSON.parse(output) as OASFRecord;
   }
 }

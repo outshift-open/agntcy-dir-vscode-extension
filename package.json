@@ -59,12 +59,12 @@
     "menus": {
       "editor/title": [
         {
-          "command": "agent-directory.signRecord",
+          "command": "agent-directory.pushRecord",
           "when": "resourceFilename =~ /.oasf.json$/",
           "group": "navigation"
         },
         {
-          "command": "agent-directory.pushRecord",
+          "command": "agent-directory.pushAndSignRecord",
           "when": "resourceFilename =~ /.oasf.json$/",
           "group": "navigation"
         }
@@ -75,7 +75,7 @@
           "when": "resourceFilename =~ /.oasf.json$/"
         },
         {
-          "command": "agent-directory.signRecord",
+          "command": "agent-directory.pushAndSignRecord",
           "when": "resourceFilename =~ /.oasf.json$/"
         },
         {
@@ -94,6 +94,10 @@
       "webview/context": [
         {
           "command": "agent-directory.openRecord",
+          "when": "webviewId == agent-directory.listof-records && webviewSection != filterRecords"
+        },
+        {
+          "command": "agent-directory.signRecord",
           "when": "webviewId == agent-directory.listof-records && webviewSection != filterRecords"
         },
         {
@@ -187,6 +191,12 @@
         "title": "Push OASF Record",
         "category": "AGNTCY",
         "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "agent-directory.pushAndSignRecord",
+        "title": "Push and Sign OASF Record",
+        "category": "AGNTCY",
+        "icon": "$(verified)"
       },
       {
         "command": "agent-directory.importAsMCPServer",

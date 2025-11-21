@@ -58,9 +58,9 @@
             <code>name=my-agent-name</code>
             <code>version=v1.0.0</code>
             <code>skill-id=10201</code>
-            <code>skill-name=Text Completion</code>
+            <code>skill=Text Completion</code>
             <code>locator=docker-image:https://example.com/docker-image</code>
-            <code>extension=my-custom-extension-name:v1.0.0</code>
+            <code>module=my-module-name:v1.0.0</code>
           </div>
         </div>
       `;

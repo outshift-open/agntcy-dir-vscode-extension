@@ -19,7 +19,7 @@ import { OASFRecord } from "../model/oasfRecord-0.7.0";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
 import { Organization } from "../clients/saasModels";
 
-export function pushRecord(context: vscode.ExtensionContext) {
+export function pushAndSignRecord(context: vscode.ExtensionContext) {
   return async () => {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -27,16 +27,37 @@ export function pushRecord(context: vscode.ExtensionContext) {
       return;
     }
     const oasfRecordContent = editor.document.getText();
-    const oasfRecord: OASFRecord = JSON.parse(oasfRecordContent) as OASFRecord;
+    let oasfRecord: OASFRecord;
+
+    try {
+      oasfRecord = JSON.parse(oasfRecordContent) as OASFRecord;
+    } catch (error) {
+      vscode.window.showErrorMessage("Failed to parse OASF record: " + error);
+      return;
+    }
 
     const selectedOrganization = context.workspaceState.get<Organization>("agent-directory.selectedOrganization")?.name || "";
+
+    let cid: string = "";
 
     try {
       const directory = DirectoryFactory.getInstance();
       const output = await directory.push(oasfRecord, selectedOrganization);
-      vscode.window.showInformationMessage("Pushed new record. CID: " + output.trim());
+      cid = output.trim();
+      vscode.window.showInformationMessage("Pushed new record. CID: " + cid);
     } catch (error) {
       vscode.window.showErrorMessage("Failed to push record: " + error);
+      return;
+    }
+
+    if (cid) {
+      try {
+        const directory = DirectoryFactory.getInstance();
+        const signedOutput = await directory.sign(selectedOrganization, cid);
+        vscode.window.showInformationMessage(`Record signed successfully: ${signedOutput.trim()}`);
+      } catch (error) {
+        vscode.window.showErrorMessage(`Failed to sign record: ${error}`);
+      }
     }
   };
 }

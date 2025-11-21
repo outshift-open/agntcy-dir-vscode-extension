@@ -15,33 +15,34 @@
 
 
 import * as vscode from "vscode";
-import { OASFRecord } from "../model/oasfRecord-0.7.0";
 import { DirectoryFactory } from "../clients/directory/DirectoryFactory";
+import { Organization } from "../clients/saasModels";
 
-export function signRecord() {
-  return async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      vscode.window.showErrorMessage("No active editor found.");
+export function signRecord(context: vscode.ExtensionContext) {
+  return async (item?: any) => {
+    if (!item?.agent) {
+      vscode.window.showErrorMessage("Please sign the record from the record list view.");
       return;
     }
 
-    const oasfRecordContent = editor.document.getText();
-    const oasfRecord = JSON.parse(oasfRecordContent) as OASFRecord;
+    const { agent } = item;
+
+    if (!agent.cid) {
+      vscode.window.showErrorMessage("No CID found for the selected record.");
+      return;
+    }
 
     let signedOutput = '';
     try {
+      const selectedOrganization = context.workspaceState.get<Organization>("agent-directory.selectedOrganization")?.name || "";
+      
       const directory = DirectoryFactory.getInstance();
-      signedOutput = await directory.sign(oasfRecord);
+      signedOutput = await directory.sign(selectedOrganization, agent.cid);
     } catch (error) {
-      vscode.window.showErrorMessage(`Failed to sign record '${oasfRecord.name}': ${error}`);
+      vscode.window.showErrorMessage(`Failed to sign record '${agent.name}': ${error}`);
       return;
     }
-    await editor.edit(editBuilder => {
-      const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
-      const fullDocumentRange = new vscode.Range(new vscode.Position(0, 0), lastLine.range.end);
-      editBuilder.replace(fullDocumentRange, signedOutput);
-    });
-    vscode.window.showInformationMessage(`Record '${oasfRecord.name}' signed, and content updated`);
+
+    vscode.window.showInformationMessage(`Record '${agent.name}' signed successfully: ${signedOutput.trim()}`);
   };
 }
