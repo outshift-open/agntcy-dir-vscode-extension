@@ -1,5 +1,13 @@
 # AGNTCY Agent Directory extension for Visual Studio Code
 
+> **⚠️ REPOSITORY ARCHIVED**
+>
+> Thank you for your engagement with this public hosted service. Based on your valuable feedback and usage patterns, we have evolved the AGNTCY Directory code base and will be decommissioning this service effective **January 20, 2026**.
+>
+> Please stay engaged by joining the [AGNTCY Directory Core Working Group](https://github.com/agntcy).
+
+---
+
 The AGNTCY Agent Directory extension for Visual Studio Code provides a seamless
 interface for developers to interact with agent directory (https://github.com/agntcy/dir) or its public hosted instance (https://agent-directory.outshift.com/). 
 
